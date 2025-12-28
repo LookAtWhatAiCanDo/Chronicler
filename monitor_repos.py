@@ -10,7 +10,7 @@ import os
 import sys
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Dict, Optional
 
 # Configure logging
@@ -53,11 +53,12 @@ def fetch_org_repos(org_name: str, token: Optional[str] = None) -> List[Dict]:
     
     url = f"https://api.github.com/orgs/{org_name}/repos"
     headers = {
-        'Accept': 'application/vnd.github.v3+json',
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
     }
     
     if token:
-        headers['Authorization'] = f'token {token}'
+        headers['Authorization'] = f'Bearer {token}'
     
     params = {
         'type': 'public',
@@ -146,7 +147,7 @@ def save_snapshot(org_name: str, repos_info: List[Dict]) -> None:
         org_name: Name of the organization
         repos_info: List of repository information
     """
-    timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.now(timezone.utc).isoformat()
     snapshot = {
         'organization': org_name,
         'timestamp': timestamp,
@@ -154,7 +155,7 @@ def save_snapshot(org_name: str, repos_info: List[Dict]) -> None:
         'repositories': repos_info
     }
     
-    filename = f"snapshots/{org_name}_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.json"
+    filename = f"snapshots/{org_name}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
     os.makedirs('snapshots', exist_ok=True)
     
     with open(filename, 'w') as f:
@@ -173,7 +174,7 @@ def display_summary(org_name: str, repos_info: List[Dict]) -> None:
     """
     print(f"\n{'='*80}")
     print(f"Organization: {org_name}")
-    print(f"Timestamp: {datetime.utcnow().isoformat()}")
+    print(f"Timestamp: {datetime.now(timezone.utc).isoformat()}")
     print(f"Total public repositories: {len(repos_info)}")
     print(f"{'='*80}\n")
     
