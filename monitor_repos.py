@@ -149,7 +149,7 @@ def fetch_latest_commit(repo_full_name: str, token: Optional[str] = None) -> Opt
         response.raise_for_status()
         commits = response.json()
         
-        if commits and len(commits) > 0:
+        if commits:
             commit = commits[0]
             return {
                 'sha': commit['sha'],
@@ -196,7 +196,8 @@ def fetch_commit_comparison(repo_full_name: str, base_sha: str, head_sha: str,
         return {
             'commits_count': len(comparison.get('commits', [])),
             'files_changed': len(comparison.get('files', [])),
-            'additions': comparison.get('total_commits', 0),
+            'additions': comparison.get('total_additions', 0),
+            'deletions': comparison.get('total_deletions', 0),
             'commits': [
                 {
                     'sha': c['sha'][:7],
@@ -415,7 +416,7 @@ def display_summary(org_name: str, repos_info: List[Dict], changes: Optional[Dic
                     print(f"  • {repo_name}")
                     if commit:
                         print(f"    Latest commit: {commit.get('sha', 'N/A')[:7]}")
-                        print(f"    Message: {commit.get('message', 'N/A').split(chr(10))[0][:60]}")
+                        print(f"    Message: {commit.get('message', 'N/A').split('\n')[0][:60]}")
                 if len(new_repos) > 5:
                     print(f"  ... and {len(new_repos) - 5} more")
             
@@ -428,7 +429,7 @@ def display_summary(org_name: str, repos_info: List[Dict], changes: Optional[Dic
                     
                     print(f"\n  • {repo_name}")
                     print(f"    Latest commit: {latest.get('sha', 'N/A')[:7]} by {latest.get('author', 'N/A')}")
-                    print(f"    Message: {latest.get('message', 'N/A').split(chr(10))[0][:70]}")
+                    print(f"    Message: {latest.get('message', 'N/A').split('\n')[0][:70]}")
                     
                     if comparison:
                         commits_count = comparison.get('commits_count', 0)
