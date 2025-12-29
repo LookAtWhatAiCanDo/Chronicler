@@ -454,10 +454,10 @@ def display_summary(org_name: str, repos_info: List[Dict], changes: Optional[Dic
         print(f"{'-'*80}")
         
         for repo in repos_info[:10]:  # Show top 10 most recently updated
-            name = repo['name'][:38] + '..' if len(repo['name']) > 38 else repo['name']
-            updated = repo['updated_at'][:10]
-            stars = str(repo['stars'])
-            language = (repo['language'] or 'N/A')[:13]
+            name = repo.get('name', 'N/A')[:38] + '..' if len(repo.get('name', '')) > 38 else repo.get('name', 'N/A')
+            updated = repo.get('updated_at', 'N/A')[:10] if repo.get('updated_at') else 'N/A'
+            stars = str(repo.get('stars', 0))
+            language = (repo.get('language') or 'N/A')[:13]
             print(f"{name:<40} {updated:<20} {stars:<8} {language:<15}")
     
     print(f"\n{'='*80}\n")
